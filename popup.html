@@ -1,0 +1,79 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Quick Stock Quotes</title>
+    <style>
+      body {
+        width: 250px;
+        height: 200px;
+        max-height: 600px;
+        overflow-y: scroll;
+        font-family: arial;
+        margin: 0px;
+        padding: 10px;
+
+      }
+
+      .QuoteItem {
+        clear: both;
+        background: #fff;
+        width: 250px;
+        height: 27px;
+        border-bottom: 1px dashed #f3f3f3;
+        margin: 2px 0;
+      }
+      
+      .LastTradePrice {
+        font-size: 13px;
+        color: #146495;
+        font-weight: bold;
+        min-width: 30px;
+        height: 17px;
+        color: #333;
+        padding: 5px;        
+        float: left;
+      }
+
+      .ticker {
+        font-size: 13px;
+        color: #146495;
+        font-weight: bold;
+        height: 17px;
+        float: left;
+        min-width: 50px;
+        padding: 5px 10px;        
+      }
+
+      .ChangeInPercent {
+        font-size: 14px;
+        float: left;
+        padding: 5px 10px;
+        height: 17px;
+      }
+
+      .green {
+        color: green;
+      }
+
+      .red {
+        color: red;
+      }
+
+      .gray {
+        color: gray;
+      }
+
+    </style>
+
+    <!--
+      - JavaScript and HTML must be in separate files: see our Content Security
+      - Policy documentation[1] for details and explanation.
+      -
+      - [1]: http://developer.chrome.com/extensions/contentSecurityPolicy.html
+     -->
+    <script src="popup.js"></script>
+  </head>
+  <body>
+  </body>
+</html>
+
