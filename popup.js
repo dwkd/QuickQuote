@@ -40,16 +40,17 @@ var StockGenerator =
       
       var ChangeInPercentClass = 'ChangeInPercent';
       var changeInPercent = q[i].ChangeinPercent.split('%')[0];
-      if (parseInt(changeInPercent) == 0) {
+      if (parseFloat(changeInPercent) == 0) {
         ChangeInPercentClass += ' gray';
-      } else if (parseInt(changeInPercent) > 0) {
-        ChangeInPercentClass += ' red';
-      } else {
+      } else if (parseFloat(changeInPercent) > 0) {
         ChangeInPercentClass += ' green';
+      } else {
+        ChangeInPercentClass += ' red';
       }
       
       QuoteItemDiv.innerHTML += "<div class='LastTradePrice'>" + q[i].LastTradePriceOnly + "</div>";        
       QuoteItemDiv.innerHTML += "<div class='" + ChangeInPercentClass + "'>" + q[i].Change + " ( " + q[i].ChangeinPercent + " )</div>";        
+      QuoteItemDiv.innerHTML += "<div class='cancel'><a href='javascript:RemoveTicker(" + q[i].symbol + ")'><img src='icon_remove.png' border='0' width='15' /></a></div>";        
 
       
       
