@@ -3,12 +3,22 @@
 var StockGenerator = 
 {
   init : function(){
-    this.GetStockWithSpecialTags('\"EVHC\",\"YHOO\",\"AAPL\"',"snd1l1yr");    
+    var defaultTickers = ["GOOG","EVHC","YHOO","APPL"], LocalTickers = [], TickerQueryString = "";
+
+    if(typeof localStorage['LocalTickers'] == 'undefined'){
+      localStorage['LocalTickers'] = JSON.stringify(defaultTickers);    
+    }
+
+    LocalTickers = JSON.parse(localStorage['LocalTickers']);
+    TickerQueryString = "\"" + LocalTickers.join("\",\"") + "\"";
+
+    this.GetStockWithSpecialTags(TickerQueryString,"snd1l1yr");
   },
 
-  GetStockWithSpecialTags : function(quoteList,tags){
-    var requestURL = "http://finance.yahoo.com/d/quotes.csv?s=" + quoteList + "&f="+ tags;    
-    var requestQuery = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from yahoo.finance.quotes where symbol IN (' + quoteList + ')') + '&format=json&env=http://datatables.org/alltables.env';
+  GetStockWithSpecialTags : function(tickerArray,tags){
+    
+    var requestURL = "http://finance.yahoo.com/d/quotes.csv?s=" + tickerArray + "&f="+ tags;    
+    var requestQuery = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from yahoo.finance.quotes where symbol IN (' + tickerArray + ')') + '&format=json&env=http://datatables.org/alltables.env';
     var req = new XMLHttpRequest();
     req.open("GET", requestQuery);
 
