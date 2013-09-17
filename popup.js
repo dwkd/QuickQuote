@@ -11,6 +11,10 @@ var StockGenerator =
     var requestQuery = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select * from yahoo.finance.quotes where symbol IN (' + quoteList + ')') + '&format=json&env=http://datatables.org/alltables.env';
     var req = new XMLHttpRequest();
     req.open("GET", requestQuery);
+
+    req.setRequestHeader('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
+    req.setRequestHeader('Accept-Language', 'en-US,en;q=0.8');
+
     req.onload = function(e) {
       StockGenerator.SendStock(e.currentTarget.responseText);
     }
