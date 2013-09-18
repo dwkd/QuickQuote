@@ -3,7 +3,7 @@
 var StockGenerator = 
 {
   init : function(){
-    this.GetStockWithSpecialTags(this.GetLocalTickers());
+    this.GetStocks(this.GetLocalTickers());
   },
   
   GetLocalTickers : function(){
@@ -14,7 +14,7 @@ var StockGenerator =
     }
 
     LocalTickers = JSON.parse(localStorage['LocalTickers']);
-    return LocalTickers.join("+");
+    return LocalTickers;
   },
   
   AddLocalTicker : function(ticker){
@@ -25,7 +25,7 @@ var StockGenerator =
       localStorage['LocalTickers'] = JSON.stringify(LocalTickers);
 
       this.DestroyTickersContainer();
-      this.GetStockWithSpecialTags(this.GetLocalTickers());
+      this.GetStocks(this.GetLocalTickers());
     }
   },
 
@@ -37,73 +37,92 @@ var StockGenerator =
       localStorage['LocalTickers'] = JSON.stringify(LocalTickers);
     }
   },
+  GetStocks : function(tickers){
 
-  GetStockWithSpecialTags : function(tickers,tags){
-     
-    var requestQuery = 'http://query.yahooapis.com/v1/public/yql?q=' + encodeURIComponent('select symbol,Change,ChangeinPercent,LastTradePriceOnly from yahoo.finance.quotes where symbol IN (' + tickers + ')') + '&format=json&env=http://datatables.org/alltables.env' + "&f="+ tags;
-    var requestQuery = 'http://dev.markitondemand.com/Api/Quote/jsonp?symbol=' + tickers;
+    for(i in tickers){
+      this.GetStock(tickers[i]);
+    }
+  },
+  GetStock : function(ticker){     
+    var requestQuery = 'http://dev.markitondemand.com/Api/Quote/jsonp?symbol=' + ticker;
     var req = new XMLHttpRequest();
     req.open("GET", requestQuery);
-
-    // req.setRequestHeader('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8');
-    // req.setRequestHeader('Accept-Language', 'en-US,en;q=0.8');
-
     req.onload = function(e) {
-      console.log(e);
-      StockGenerator.CreateTickersContainer(e.currentTarget.responseText);
+      var data = e.currentTarget.responseText.split('(function () { })(')[1];
+      data = data.slice(0,data.length-1);
+      StockGenerator.AddTickerToContainer(data);
     }
     req.send(null);
 
-    // StockGenerator.CreateTickersContainer();
-
   },
 
-  CreateTickersContainer : function(jsonResponse) {
-    // remove this - testing purposes
-    // jsonResponse = '{"query":{"count":2,"created":"2013-09-17T05:52:37Z","lang":"en-US","results":{"quote":[{"symbol":"EVHC","Ask":null,"AverageDailyVolume":"1056990","Bid":null,"AskRealtime":"29.13","BidRealtime":"23.00","BookValue":"4.15","Change_PercentChange":"-1.06 - -3.72%","Change":"-1.06","Commission":null,"ChangeRealtime":"-1.06","AfterHoursChangeRealtime":"N/A - N/A","DividendShare":"0.00","LastTradeDate":"9/16/2013","TradeDate":null,"EarningsShare":"0.248","ErrorIndicationreturnedforsymbolchangedinvalid":null,"EPSEstimateCurrentYear":"0.00","EPSEstimateNextYear":"0.00","EPSEstimateNextQuarter":"0.00","DaysLow":"27.14","DaysHigh":"28.44","YearLow":"24.62","YearHigh":"28.88","HoldingsGainPercent":"- - -","AnnualizedGain":null,"HoldingsGain":null,"HoldingsGainPercentRealtime":"N/A - N/A","HoldingsGainRealtime":null,"MoreInfo":"npiIed","OrderBookRealtime":null,"MarketCapitalization":"4.779B","MarketCapRealtime":null,"EBITDA":"432.0M","ChangeFromYearLow":"+2.83","PercentChangeFromYearLow":"+11.49%","LastTradeRealtimeWithTime":"N/A - <b>27.45</b>","ChangePercentRealtime":"N/A - -3.72%","ChangeFromYearHigh":"-1.43","PercebtChangeFromYearHigh":"-4.95%","LastTradeWithTime":"Sep 16 - <b>27.45</b>","LastTradePriceOnly":"27.45","HighLimit":null,"LowLimit":null,"DaysRange":"27.14 - 28.44","DaysRangeRealtime":"N/A - N/A","FiftydayMovingAverage":"26.433","TwoHundreddayMovingAverage":"26.433","ChangeFromTwoHundreddayMovingAverage":"+1.017","PercentChangeFromTwoHundreddayMovingAverage":"+3.85%","ChangeFromFiftydayMovingAverage":"+1.017","PercentChangeFromFiftydayMovingAverage":"+3.85%","Name":"Envision Healthca","Notes":null,"Open":"28.22","PreviousClose":"28.51","PricePaid":null,"ChangeinPercent":"-3.72%","PriceSales":"0.79","PriceBook":"6.87","ExDividendDate":null,"PERatio":"114.96","DividendPayDate":null,"PERatioRealtime":null,"PEGRatio":null,"PriceEPSEstimateCurrentYear":null,"PriceEPSEstimateNextYear":null,"Symbol":"EVHC","SharesOwned":null,"ShortRatio":null,"LastTradeTime":"4:04pm","TickerTrend":"&nbsp;++==-+&nbsp;","OneyrTargetPrice":null,"Volume":"566454","HoldingsValue":null,"HoldingsValueRealtime":null,"YearRange":"24.62 - 28.88","DaysValueChange":"- - -3.72%","DaysValueChangeRealtime":"N/A - N/A","StockExchange":"NYSE","DividendYield":null,"PercentChange":"-3.72%"},{"symbol":"YHOO","Ask":"29.65","AverageDailyVolume":"16650000","Bid":null,"AskRealtime":"29.65","BidRealtime":"0.00","BookValue":"12.966","Change_PercentChange":"+0.36 - +1.23%","Change":"+0.36","Commission":null,"ChangeRealtime":"+0.36","AfterHoursChangeRealtime":"N/A - N/A","DividendShare":"0.00","LastTradeDate":"9/16/2013","TradeDate":null,"EarningsShare":"3.632","ErrorIndicationreturnedforsymbolchangedinvalid":null,"EPSEstimateCurrentYear":"1.47","EPSEstimateNextYear":"1.67","EPSEstimateNextQuarter":"0.41","DaysLow":"29.51","DaysHigh":"30.04","YearLow":"15.55","YearHigh":"30.27","HoldingsGainPercent":"- - -","AnnualizedGain":null,"HoldingsGain":null,"HoldingsGainPercentRealtime":"N/A - N/A","HoldingsGainRealtime":null,"MoreInfo":"cn","OrderBookRealtime":null,"MarketCapitalization":"30.222B","MarketCapRealtime":null,"EBITDA":"1.284B","ChangeFromYearLow":"+14.07","PercentChangeFromYearLow":"+90.48%","LastTradeRealtimeWithTime":"N/A - <b>29.62</b>","ChangePercentRealtime":"N/A - +1.23%","ChangeFromYearHigh":"-0.65","PercebtChangeFromYearHigh":"-2.15%","LastTradeWithTime":"Sep 16 - <b>29.62</b>","LastTradePriceOnly":"29.62","HighLimit":null,"LowLimit":null,"DaysRange":"29.51 - 30.04","DaysRangeRealtime":"N/A - N/A","FiftydayMovingAverage":"27.952","TwoHundreddayMovingAverage":"25.8476","ChangeFromTwoHundreddayMovingAverage":"+3.7724","PercentChangeFromTwoHundreddayMovingAverage":"+14.59%","ChangeFromFiftydayMovingAverage":"+1.668","PercentChangeFromFiftydayMovingAverage":"+5.97%","Name":"Yahoo! Inc.","Notes":null,"Open":"29.63","PreviousClose":"29.26","PricePaid":null,"ChangeinPercent":"+1.23%","PriceSales":"6.19","PriceBook":"2.26","ExDividendDate":null,"PERatio":"8.06","DividendPayDate":null,"PERatioRealtime":null,"PEGRatio":"1.74","PriceEPSEstimateCurrentYear":"19.90","PriceEPSEstimateNextYear":"17.52","Symbol":"YHOO","SharesOwned":null,"ShortRatio":"1.80","LastTradeTime":"4:00pm","TickerTrend":"&nbsp;==+===&nbsp;","OneyrTargetPrice":"29.38","Volume":"15817078","HoldingsValue":null,"HoldingsValueRealtime":null,"YearRange":"15.55 - 30.27","DaysValueChange":"- - +1.23%","DaysValueChangeRealtime":"N/A - N/A","StockExchange":"NasdaqNM","DividendYield":null,"PercentChange":"+1.23%"}]}}}';
-
-    var div = document.createElement('div');
-    div.id = "TickersContainer";
-
-    o = JSON.parse(jsonResponse);
-    q = o.query.results.quote
-    for(var i=0; i< q.length; i++){
-
-      var QuoteItemDiv = document.createElement('div');
-      QuoteItemDiv.className = 'QuoteItem';
-      QuoteItemDiv.appendChild(this.CreateDOMElement('div','ticker', q[i].symbol));             
-      QuoteItemDiv.appendChild(this.CreateDOMElement('div','LastTradePrice', q[i].LastTradePriceOnly));   
-
-      var ChangeInPercentClass = 'ChangeInPercent';
-      var changeInPercent = q[i].ChangeinPercent.split('%')[0];
-      if (parseFloat(changeInPercent) == 0) {
-        ChangeInPercentClass += ' gray';
-      } else if (parseFloat(changeInPercent) > 0) {
-        ChangeInPercentClass += ' green';
-      } else {
-        ChangeInPercentClass += ' red';
-      }
-      
-      QuoteItemDiv.appendChild(this.CreateDOMElement('div',ChangeInPercentClass, q[i].Change + " ( " + q[i].ChangeinPercent + " ) "));        
-      
-      var img = this.CreateDOMElement('img');
-      img.setAttribute('ticker',q[i].symbol);
-      img.src = 'icon_remove.png';
-      img.width = 15;
-      img.onclick = function(){
-        this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
-        StockGenerator.RemoveLocalTicker(this.getAttribute('ticker'));
-      }
-
-      var removeDiv = this.CreateDOMElement('div','cancel');
-      removeDiv.appendChild(img);
-
-      QuoteItemDiv.appendChild(removeDiv);      
-      div.appendChild(QuoteItemDiv);      
+  AddTickerToContainer : function(jsonResponse) {
+ 
+    var TickersContainer = document.getElementById('TickersContainer');
+    if(typeof o == 'undefined'){
+      var div = document.createElement('div');
+      div.id = "TickersContainer";
+      document.body.appendChild(div);
+      TickersContainer = document.getElementById('TickersContainer');      
     }
 
-    document.body.appendChild(div);
+    o = JSON.parse(jsonResponse);
+    q = o.Data
 
+    var TickerItemDiv = document.createElement('div');
+    TickerItemDiv.className = 'QuoteItem';
+    TickerItemDiv.setAttribute('ticker',q.Symbol);
+    TickerItemDiv.appendChild(this.CreateDOMElement('div','ticker', q.Symbol));             
+    TickerItemDiv.appendChild(this.CreateDOMElement('div','LastTradePrice', q.LastPrice.toFixed(2)));   
+
+    var ChangeInPercentClass = 'ChangeInPercent';
+    if (parseFloat(q.ChangePercent) == 0) {
+      ChangeInPercentClass += ' gray';
+    } else if (parseFloat(q.ChangePercent) > 0) {
+      ChangeInPercentClass += ' green';
+    } else {
+      ChangeInPercentClass += ' red';
+    }
+    
+    TickerItemDiv.appendChild(this.CreateDOMElement('div',ChangeInPercentClass, q.Change.toFixed(2) + " ( " + (parseFloat(q.ChangePercent) > 0 ? "+" : "") + q.ChangePercent.toFixed(2) + "% ) "));        
+    
+    var img = this.CreateDOMElement('img');
+    img.setAttribute('ticker',q.Symbol);
+    img.src = 'icon_remove.png';
+    img.width = 15;
+    img.onclick = function(){
+      this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
+      StockGenerator.RemoveLocalTicker(this.getAttribute('ticker'));
+    }
+
+    var removeDiv = this.CreateDOMElement('div','cancel');
+    removeDiv.appendChild(img);
+
+    TickerItemDiv.appendChild(removeDiv);      
+    TickersContainer.appendChild(TickerItemDiv); 
+    StockGenerator.SortTickersContainer();
+  },
+
+  SortTickersContainer : function(){
+    var TickersContainer = document.getElementById('TickersContainer');
+    var TickerItems = TickersContainer.childNodes;
+    var TickerItemsArray = [];
+
+    for(i in TickerItems){
+      if(TickerItems[i].nodeType == 1)
+        TickerItemsArray.push(TickerItems[i]);
+    }
+
+    TickerItemsArray.sort( 
+      function(a,b){
+        return a.innerHTML == b.innerHTML
+          ? 0
+          : (a.innerHTML > b.innerHTML ? 1 : -1);
+      }
+    );
+    for(i in TickerItemsArray){
+      TickersContainer.appendChild(TickerItemsArray[i]);
+    }
   },
 
   DestroyTickersContainer : function(){
