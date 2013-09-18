@@ -7,7 +7,7 @@
 
 	"permissions": 
 	[
-		
+		"http://dev.markitondemand.com/Api/Quote/*"	
 	],
 	"browser_action": 
 	{
