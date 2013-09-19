@@ -84,7 +84,8 @@ var StockGenerator =
       ChangeInPercentClass += ' red';
     }
     var ChangeFormatted = ((q.Change.toFixed(3) > 0 && q.Change.toFixed(3) < 0.010) || (q.Change.toFixed(3) < 0 && q.Change.toFixed(3) > -0.010)  ? q.Change.toFixed(3) : q.Change.toFixed(2));
-    TickerItemDiv.appendChild(this.CreateDOMElement('div',ChangeInPercentClass, ChangeFormatted + " ( " + (parseFloat(q.ChangePercent.toFixed(3)) > 0 ? "+" : "") + q.ChangePercent.toFixed(3) + "% ) "));        
+    var ChangePercentFormatted = ((q.ChangePercent.toFixed(3) > 0 && q.ChangePercent.toFixed(3) < 0.010) || (q.ChangePercent.toFixed(3) < 0 && q.ChangePercent.toFixed(3) > -0.010)  ? q.ChangePercent.toFixed(3) : q.ChangePercent.toFixed(2));
+    TickerItemDiv.appendChild(this.CreateDOMElement('div',ChangeInPercentClass, (parseFloat(ChangePercentFormatted) > 0 ? "+" : "") + ChangeFormatted + " ( " + (parseFloat(ChangePercentFormatted) > 0 ? "+" : "") + ChangePercentFormatted + "% ) "));        
     
     var img = this.CreateDOMElement('img');
     img.setAttribute('ticker',q.Symbol);
