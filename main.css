@@ -66,3 +66,11 @@ body {
 .gray {
   color: gray;
 }
+
+.TickerInputContainer {
+  clear: both;
+  background: #fff;
+  min-width: 280px;
+  height: 30px;
+  padding: 10px 5px;
+}

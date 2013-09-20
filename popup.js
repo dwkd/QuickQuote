@@ -4,6 +4,7 @@ var StockGenerator =
 {
   init : function(){
     this.GetStocks(this.GetLocalTickers());
+    this.CreateTickerInputContainer();
   },
   
   GetLocalTickers : function(){
@@ -128,6 +129,17 @@ var StockGenerator =
 
   DestroyTickersContainer : function(){
     document.body.removeChild(document.getElementById('TickersContainer'));
+  },
+
+  CreateTickerInputContainer : function(){
+    var div = StockGenerator.CreateDOMElement("div","TickerInputContainer");
+    var label = StockGenerator.CreateDOMElement("label");    
+    label.innerHTML = "Add: ";
+    var input = StockGenerator.CreateDOMElement("input");
+    input.width = 100;
+    div.appendChild(label);
+    div.appendChild(input);
+    document.body.appendChild(div);
   },
   
   CreateDOMElement : function(otype, oclass, oinnerHTML){
