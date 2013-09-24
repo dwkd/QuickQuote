@@ -146,7 +146,10 @@ var StockGenerator =
     }
 
     input.onblur = function(){
-      this.value = this.value == "" ? "Search or Get Quote" : this.value;
+      if(this.value == ""){
+        this.value = 'Search or Get Quote';
+        StockGenerator.DestroyTypeAhead();
+      }
     }
 
     input.onkeyup = function(){
@@ -155,7 +158,7 @@ var StockGenerator =
       req.onload = function(e) {
         var data = e.currentTarget.responseText.split('(function () { })(')[1];
         data = data.slice(0,data.length-1);        
-        StockGenerator.ShowTypeAhead(data);
+        StockGenerator.ShowTypeAhead(JSON.parse(data)[0]);
       }
       req.send(null);
     
@@ -168,8 +171,23 @@ var StockGenerator =
 
   ShowTypeAhead : function(o){
     var TypeAheadDiv = StockGenerator.CreateDOMElement("div","TypeAheadContainer");
-    TypeAheadDiv.innerHTML = o;
+    TypeAheadDiv.id = "TypeAheadDiv";
+    
+    var TypeAheadCompanyName = StockGenerator.CreateDOMElement("div","TypeAheadCompanyName");
+    TypeAheadCompanyName.innerHTML = o.Name.substr(0,23) + (o.Name.length > 23 ? '...' : '');
+
+    var TypeAheadTickerValue = StockGenerator.CreateDOMElement("div","TypeAheadTickerValue");
+    TypeAheadTickerValue.innerHTML = o.Symbol;
+
+    TypeAheadDiv.appendChild(TypeAheadCompanyName);
+    TypeAheadDiv.appendChild(TypeAheadTickerValue);
     document.getElementById('TickersContainer').appendChild(TypeAheadDiv);
+  },
+
+  DestroyTypeAhead : function(){
+    var o = document.getElementById('TypeAheadDiv');
+    document.getElementById('TickersContainer').removeChild(o);
+
   },
   
   CreateDOMElement : function(otype, oclass, oinnerHTML){
