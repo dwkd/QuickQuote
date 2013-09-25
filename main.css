@@ -123,6 +123,7 @@ body {
     color-stop(0.59, rgb(250,250,250)),
     color-stop(0.8, rgb(255,255,255))
   );
+  cursor: pointer;
 }
 
 .TypeAheadCompanyName {

@@ -3,9 +3,9 @@
 var StockGenerator = 
 {
   init : function(){
-    this.CreateTickersContainer();
-    this.CreateTickerInputContainer();
-    this.GetStocks(this.GetLocalTickers());
+    StockGenerator.CreateTickersContainer();
+    StockGenerator.CreateTickerInputContainer();
+    StockGenerator.GetStocks(this.GetLocalTickers());
   },
   
   GetLocalTickers : function(){
@@ -26,8 +26,16 @@ var StockGenerator =
       LocalTickers.push(ticker);
       localStorage['LocalTickers'] = JSON.stringify(LocalTickers);
 
-      this.DestroyTickersContainer();
-      this.GetStocks(this.GetLocalTickers());
+      StockGenerator.DestroyTickersContainer();
+      StockGenerator.DestroyTickerInputContainer();
+
+      StockGenerator.CreateTickersContainer();
+      StockGenerator.CreateTickerInputContainer();
+      StockGenerator.GetStocks(StockGenerator.GetLocalTickers());
+    } else {
+      
+     //  background-color: #AD310B;
+     // -webkit-transition: background-color 1000ms linear;
     }
   },
 
@@ -42,7 +50,7 @@ var StockGenerator =
   GetStocks : function(tickers){
 
     for(i in tickers){
-      this.GetStock(tickers[i]);
+      StockGenerator.GetStock(tickers[i]);
     }
   },
   GetStock : function(ticker){     
@@ -131,9 +139,10 @@ var StockGenerator =
   DestroyTickersContainer : function(){
     document.body.removeChild(document.getElementById('TickersContainer'));
   },
-
+  
   CreateTickerInputContainer : function(){
     var div = StockGenerator.CreateDOMElement("div","TickerInputContainer");
+    div.id = "TickerInputContainer";
     
     var input = StockGenerator.CreateDOMElement("input","TickerInput");
     input.value = "Search or Get Quote";
@@ -169,9 +178,16 @@ var StockGenerator =
     document.body.appendChild(div);
   },
 
+  DestroyTickerInputContainer : function(){
+    document.body.removeChild(document.getElementById('TickerInputContainer'));
+  },
+
   ShowTypeAhead : function(o){
     var TypeAheadDiv = StockGenerator.CreateDOMElement("div","TypeAheadContainer");
     TypeAheadDiv.id = "TypeAheadDiv";
+    TypeAheadDiv.onclick = function(){
+      StockGenerator.AddLocalTicker(o.Symbol);
+    }
     
     var TypeAheadCompanyName = StockGenerator.CreateDOMElement("div","TypeAheadCompanyName");
     TypeAheadCompanyName.innerHTML = o.Name.substr(0,23) + (o.Name.length > 23 ? '...' : '');
