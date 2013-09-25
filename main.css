@@ -37,6 +37,15 @@ body {
     }
 }
 
+@-webkit-keyframes bgFade { /* Safari and Chrome */
+    from {
+        background-color: #FAF1AC;
+    }
+    to {
+        background-color: white;
+    }
+}
+
 .LastTradePrice {
   font-size: 13px;
   color: #146495;

@@ -57,7 +57,12 @@ var StockGenerator =
     req.onload = function(e) {
       var data = e.currentTarget.responseText.split('(function () { })(')[1];
       data = data.slice(0,data.length-1);
-      StockGenerator.AddTickerToContainer(data,useFade);
+      if(typeof JSON.parse(data).Message == 'undefined') {
+        StockGenerator.AddTickerToContainer(data,useFade);        
+      } else {
+        alert('Invalid ticker: '+ticker);
+        StockGenerator.RemoveLocalTicker(ticker);
+      }
     }
     req.send(null);
 
@@ -170,20 +175,22 @@ var StockGenerator =
     input.onblur = function(){
       if(this.value == ""){
         this.value = 'Search or Get Quote';
-        StockGenerator.DestroyTypeAhead();
+        StockGenerator.DestroyTickerInputContainer();
+        StockGenerator.CreateTickerInputContainer();
       }
     }
 
     input.onkeyup = function(){
-      var req = new XMLHttpRequest();
-      req.open("GET", "http://dev.markitondemand.com/Api/Lookup/jsonp?input=" + this.value);
-      req.onload = function(e) {
-        var data = e.currentTarget.responseText.split('(function () { })(')[1];
-        data = data.slice(0,data.length-1);        
-        StockGenerator.ShowTypeAhead(JSON.parse(data)[0]);
+      if(this.value != ""){
+        var req = new XMLHttpRequest();
+        req.open("GET", "http://dev.markitondemand.com/Api/Lookup/jsonp?input=" + this.value);
+        req.onload = function(e) {
+          var data = e.currentTarget.responseText.split('(function () { })(')[1];
+          data = data.slice(0,data.length-1);     
+          StockGenerator.ShowTypeAhead(JSON.parse(data)[0]);
+        }
+        req.send(null);
       }
-      req.send(null);
-    
     }
 
     div.appendChild(input);
@@ -197,16 +204,24 @@ var StockGenerator =
 
   ShowTypeAhead : function(o){
     var TypeAheadDiv = StockGenerator.CreateDOMElement("div","TypeAheadContainer");
-    TypeAheadDiv.id = "TypeAheadDiv";
-    TypeAheadDiv.onclick = function(){
-      StockGenerator.AddLocalTicker(o.Symbol);      
-    }
-    
     var TypeAheadCompanyName = StockGenerator.CreateDOMElement("div","TypeAheadCompanyName");
-    TypeAheadCompanyName.innerHTML = o.Name.substr(0,23) + (o.Name.length > 23 ? '...' : '');
-
     var TypeAheadTickerValue = StockGenerator.CreateDOMElement("div","TypeAheadTickerValue");
-    TypeAheadTickerValue.innerHTML = o.Symbol;
+
+    TypeAheadDiv.id = "TypeAheadDiv";
+    if(typeof o != 'undefined') {
+      TypeAheadDiv.onclick = function(){
+        StockGenerator.AddLocalTicker(o.Symbol);      
+      }
+      
+      TypeAheadCompanyName.innerHTML = o.Name.substr(0,23) + (o.Name.length > 23 ? '...' : '');
+      TypeAheadTickerValue.innerHTML = o.Symbol;
+    } else {
+      TypeAheadCompanyName.innerHTML = 'Invalid Company Name or Ticker';
+      TypeAheadCompanyName.style.fontStyle = 'italic';
+      TypeAheadCompanyName.style.color = 'red';
+      TypeAheadCompanyName.style.width = '200px';
+      TypeAheadTickerValue.style.width = '10px';
+    }
 
     TypeAheadDiv.appendChild(TypeAheadCompanyName);
     TypeAheadDiv.appendChild(TypeAheadTickerValue);
