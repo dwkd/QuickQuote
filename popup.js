@@ -1,5 +1,4 @@
 
-
 var StockGenerator = 
 {
   init : function(){
@@ -26,17 +25,15 @@ var StockGenerator =
       LocalTickers.push(ticker);
       localStorage['LocalTickers'] = JSON.stringify(LocalTickers);
 
-      StockGenerator.DestroyTickersContainer();
-      StockGenerator.DestroyTickerInputContainer();
-
-      StockGenerator.CreateTickersContainer();
-      StockGenerator.CreateTickerInputContainer();
-      StockGenerator.GetStocks(StockGenerator.GetLocalTickers());
+      StockGenerator.GetStock(ticker,true);      
     } else {
-      
-     //  background-color: #AD310B;
-     // -webkit-transition: background-color 1000ms linear;
+      // StockGenerator.RemoveTickersFade();
+      var e = document.getElementById('ticker_'+ticker);
+      e.classList.remove('bgFade');
+      setTimeout(function(){ e.classList.add('bgFade'); },1)
     }
+    StockGenerator.DestroyTickerInputContainer();
+    StockGenerator.CreateTickerInputContainer();
   },
 
   RemoveLocalTicker : function(ticker){
@@ -50,17 +47,17 @@ var StockGenerator =
   GetStocks : function(tickers){
 
     for(i in tickers){
-      StockGenerator.GetStock(tickers[i]);
+      StockGenerator.GetStock(tickers[i],false);
     }
   },
-  GetStock : function(ticker){     
+  GetStock : function(ticker,useFade){     
     var requestQuery = 'http://dev.markitondemand.com/Api/Quote/jsonp?symbol=' + ticker;
     var req = new XMLHttpRequest();
     req.open("GET", requestQuery);
     req.onload = function(e) {
       var data = e.currentTarget.responseText.split('(function () { })(')[1];
       data = data.slice(0,data.length-1);
-      StockGenerator.AddTickerToContainer(data);
+      StockGenerator.AddTickerToContainer(data,useFade);
     }
     req.send(null);
 
@@ -72,7 +69,7 @@ var StockGenerator =
     document.body.appendChild(div);     
   },
 
-  AddTickerToContainer : function(jsonResponse) {
+  AddTickerToContainer : function(jsonResponse,useFade) {
  
     var TickersContainer = document.getElementById('TickersContainer');    
 
@@ -80,8 +77,9 @@ var StockGenerator =
     q = o.Data
 
     var TickerItemDiv = document.createElement('div');
-    TickerItemDiv.className = 'QuoteItem';
+    TickerItemDiv.className = 'QuoteItem' + (useFade ? ' bgFade' : '');
     TickerItemDiv.setAttribute('ticker',q.Symbol);
+    TickerItemDiv.id = 'ticker_' + q.Symbol;
     TickerItemDiv.appendChild(this.CreateDOMElement('div','ticker', q.Symbol));             
     TickerItemDiv.appendChild(this.CreateDOMElement('div','LastTradePrice', q.LastPrice.toFixed(2)));   
 
@@ -110,6 +108,7 @@ var StockGenerator =
     removeDiv.appendChild(img);
 
     TickerItemDiv.appendChild(removeDiv);      
+    StockGenerator.RemoveTickersFade();
     TickersContainer.appendChild(TickerItemDiv); 
     StockGenerator.SortTickersContainer();
   },
@@ -136,6 +135,17 @@ var StockGenerator =
     }
   },
 
+  RemoveTickersFade : function(){
+    var TickersContainer = document.getElementById('TickersContainer');
+    var TickerItems = TickersContainer.childNodes;
+
+
+    for(i in TickerItems){
+      if(TickerItems[i].nodeType == 1)
+        TickerItems[i].classList.remove('bgFade');
+    }
+  },
+
   DestroyTickersContainer : function(){
     document.body.removeChild(document.getElementById('TickersContainer'));
   },
@@ -149,6 +159,9 @@ var StockGenerator =
     
     var img = StockGenerator.CreateDOMElement("img","AddButton");
     img.src = "icon_add.png";
+    img.onclick = function(){
+      StockGenerator.AddLocalTicker(input.value);
+    }
 
     input.onfocus = function(){
       this.value = this.value == "Search or Get Quote" ? "" : this.value;
@@ -186,7 +199,7 @@ var StockGenerator =
     var TypeAheadDiv = StockGenerator.CreateDOMElement("div","TypeAheadContainer");
     TypeAheadDiv.id = "TypeAheadDiv";
     TypeAheadDiv.onclick = function(){
-      StockGenerator.AddLocalTicker(o.Symbol);
+      StockGenerator.AddLocalTicker(o.Symbol);      
     }
     
     var TypeAheadCompanyName = StockGenerator.CreateDOMElement("div","TypeAheadCompanyName");
@@ -197,12 +210,12 @@ var StockGenerator =
 
     TypeAheadDiv.appendChild(TypeAheadCompanyName);
     TypeAheadDiv.appendChild(TypeAheadTickerValue);
-    document.getElementById('TickersContainer').appendChild(TypeAheadDiv);
+    document.getElementById('TickerInputContainer').appendChild(TypeAheadDiv);
   },
 
   DestroyTypeAhead : function(){
     var o = document.getElementById('TypeAheadDiv');
-    document.getElementById('TickersContainer').removeChild(o);
+    document.getElementById('TickerInputContainer').removeChild(o);
 
   },
   

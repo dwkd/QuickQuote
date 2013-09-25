@@ -10,11 +10,31 @@ body {
 
 .QuoteItem {
   clear: both;
-  background: #fff;
+  background-color: #fff;  
   min-width: 280px;
   height: 27px;
   border-bottom: 1px dashed #f3f3f3;
   margin: 2px 0;
+}
+
+.bgFade {
+  -webkit-animation: bgFade 1000ms;
+  -webkit-animation-timing-function: ease-out;
+  -webkit-animation-fill-mode: none;
+
+}
+.bgFade2 {
+  -webkit-animation: bgFade 1000ms;
+  -webkit-animation-timing-function: ease-out;
+}
+
+@-webkit-keyframes bgFade { /* Safari and Chrome */
+    from {
+        background-color: #FAF1AC;
+    }
+    to {
+        background-color: white;
+    }
 }
 
 .LastTradePrice {
@@ -108,7 +128,7 @@ body {
   color:#999;
   font-family: arial;
   font-size:11px;
-  margin: 30px 0 0 10px;
+  margin: 20px 0 0 0px;
   -webkit-border-radius: 0 0 5px 5px;
   width: 200px;
   padding: 5px 5px 0 5px;
