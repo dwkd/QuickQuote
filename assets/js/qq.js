@@ -6,7 +6,7 @@ var StockGenerator =
     StockGenerator.CreateTickerInputContainer();
     StockGenerator.GetStocks(StockGenerator.GetLocalTickers());
     StockGenerator.CreateInfoIcon();
-    var myTimeout = setInterval( function(){StockGenerator.GetStocks(StockGenerator.GetLocalTickers());}, 10000);
+    var myTimeout = setInterval( function(){StockGenerator.GetStocks(StockGenerator.GetLocalTickers());}, 30000);
   },
   
   GetLocalTickers : function(){
