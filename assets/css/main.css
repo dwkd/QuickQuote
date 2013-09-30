@@ -23,21 +23,12 @@ body {
   -webkit-animation-fill-mode: none;
 
 }
-.bgFade2 {
-  -webkit-animation: bgFade 1000ms;
+.bgFadeRefresh {
+  -webkit-animation: bgFadeRefresh 1000ms;
   -webkit-animation-timing-function: ease-out;
 }
 
-@-webkit-keyframes bgFade { /* Safari and Chrome */
-    from {
-        background-color: #FAF1AC;
-    }
-    to {
-        background-color: white;
-    }
-}
-
-@-webkit-keyframes bgFade { /* Safari and Chrome */
+@-webkit-keyframes bgFade {
     from {
         background-color: #FAF1AC;
     }
@@ -163,3 +154,68 @@ body {
 .TypeAheadTickerValue {
   float: right;
 }
+
+.InfoIcon {
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  height: 14px;
+}
+
+.InfoIcon img {
+  cursor: pointer;
+}
+
+.MoreInfoContainer {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  padding: 0 10%;
+  width: 80%;
+  min-height: 100%;
+  background: url('/assets/images/bg_transparent_w.png');
+  z-index: 10000;
+}
+
+.MoreInfo {
+  margin-top:20px;
+  padding: 10%;
+  width: 80%;
+  height: 100px;
+  background: white;
+  font-family: arial;
+  font-size: 10px;
+  color: #999;
+  text-align: center;
+  -webkit-border-radius: 10px;
+  border: 1px solid #f3f3f3;
+}
+
+.closeInfo {
+  position: absolute;
+  top:25px;
+  right: 11%;
+  width: 15px;
+  height: 12px;
+  padding-bottom: 2px;
+  text-align: center;
+  -webkit-border-radius: 4px;
+  border: 1px solid #f3f3f3;
+  cursor: pointer;
+  color: #999999;
+}
+
+.git {
+  padding: 35px 0 20px 0;  
+  color: #f3f3f3;
+  margin: 0px auto;
+  text-align: center;
+}
+
+.git iframe {
+  margin: 0px auto;
+}
+
+.git a:link, .git a:visited, .MoreInfo a:link, .MoreInfo a:visited {
+  color: #3697d4;
+};

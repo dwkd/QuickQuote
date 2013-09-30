@@ -2,16 +2,18 @@
 	"manifest_version": 2,
 
 	"name": "QuickQuotes",
-	"description": "Quick Stock Quotes",
+	"description": "Stock Quotes",
 	"version": "1.0",
 
 	"permissions": 
 	[
-		"http://dev.markitondemand.com/Api/Quote/*"	
+		"http://dev.markitondemand.com/Api/Quote/*",
+		"http://www.timeapi.org/utc/now"
+
 	],
 	"browser_action": 
 	{
-		"default_icon": "icon.png",
-		"default_popup": "popup.html"
+		"default_icon": "assets/images/icon.png",
+		"default_popup": "qq.html"
 	}
 }

@@ -4,11 +4,13 @@ var StockGenerator =
   init : function(){
     StockGenerator.CreateTickersContainer();
     StockGenerator.CreateTickerInputContainer();
-    StockGenerator.GetStocks(this.GetLocalTickers());
+    StockGenerator.GetStocks(StockGenerator.GetLocalTickers());
+    StockGenerator.CreateInfoIcon();
+    var myTimeout = setInterval( function(){StockGenerator.GetStocks(StockGenerator.GetLocalTickers());}, 10000);
   },
   
   GetLocalTickers : function(){
-    var defaultTickers = ["GOOG","EVHC","YHOO","AAPL","FB","MMM"], LocalTickers = [], TickerQueryString = "";
+    var defaultTickers = ["GOOG","YHOO","AAPL","FB","EVHC"], LocalTickers = [], TickerQueryString = "";
 
     if(typeof localStorage['LocalTickers'] == 'undefined'){
       localStorage['LocalTickers'] = JSON.stringify(defaultTickers);    
@@ -27,7 +29,6 @@ var StockGenerator =
 
       StockGenerator.GetStock(ticker,true);      
     } else {
-      // StockGenerator.RemoveTickersFade();
       var e = document.getElementById('ticker_'+ticker);
       e.classList.remove('bgFade');
       setTimeout(function(){ e.classList.add('bgFade'); },1)
@@ -44,28 +45,46 @@ var StockGenerator =
       localStorage['LocalTickers'] = JSON.stringify(LocalTickers);
     }
   },
+
+  RefreshLocalTickers : function(){
+    var tickers = StockGenerator.GetLocalTickers();
+  },
+
   GetStocks : function(tickers){
 
     for(i in tickers){
       StockGenerator.GetStock(tickers[i],false);
     }
   },
-  GetStock : function(ticker,useFade){     
-    var requestQuery = 'http://dev.markitondemand.com/Api/Quote/jsonp?symbol=' + ticker;
-    var req = new XMLHttpRequest();
-    req.open("GET", requestQuery);
-    req.onload = function(e) {
-      var data = e.currentTarget.responseText.split('(function () { })(')[1];
-      data = data.slice(0,data.length-1);
-      if(typeof JSON.parse(data).Message == 'undefined') {
-        StockGenerator.AddTickerToContainer(data,useFade);        
-      } else {
-        alert('Invalid ticker: '+ticker);
-        StockGenerator.RemoveLocalTicker(ticker);
+
+  GetStock : function(ticker,useFade){
+    if (ticker == 'Search or Get Quote'){
+      StockGenerator.LoadMoreInfoPopover('Invalid ticker');
+    } else {
+      var requestQuery = 'http://dev.markitondemand.com/Api/Quote/jsonp?symbol=' + ticker;
+      var req = new XMLHttpRequest();
+      req.open("GET", requestQuery);
+      req.onload = function(e) {
+        var data = e.currentTarget.responseText.split('(function () { })(')[1];
+        data = data.slice(0,data.length-1);
+        if(typeof JSON.parse(data).Message == 'undefined') {
+          StockGenerator.AddTickerToContainer(data,useFade);        
+        } else {
+          StockGenerator.RemoveLocalTicker(ticker);
+          StockGenerator.LoadMoreInfoPopover('Invalid ticker: '+ticker);
+        }
       }
+      req.send(null);
+    }
+  },
+
+  CreateMarketTimeAndLastUpdatedContainer : function(){
+    var req = new XMLHttpRequest();
+    req.open("GET", "http://www.timeapi.org/utc/now?format=%25b%20%25d,%20%25Y%20%25I:%25M:%25S");
+    req.onload = function(e) {
+      // do stuff
     }
     req.send(null);
-
   },
 
   CreateTickersContainer : function(){
@@ -78,9 +97,16 @@ var StockGenerator =
  
     var TickersContainer = document.getElementById('TickersContainer');    
 
-    o = JSON.parse(jsonResponse);
-    q = o.Data
+    var q = JSON.parse(jsonResponse).Data
 
+    if(document.getElementById('ticker_'+q.Symbol))
+    {
+      document.getElementById('ticker_'+q.Symbol).parentNode.removeChild(document.getElementById('ticker_'+q.Symbol));
+      useFade = true;
+    } else {
+      StockGenerator.RemoveTickersFade();
+    }    
+    
     var TickerItemDiv = document.createElement('div');
     TickerItemDiv.className = 'QuoteItem' + (useFade ? ' bgFade' : '');
     TickerItemDiv.setAttribute('ticker',q.Symbol);
@@ -102,7 +128,7 @@ var StockGenerator =
     
     var img = this.CreateDOMElement('img');
     img.setAttribute('ticker',q.Symbol);
-    img.src = 'icon_remove.png';
+    img.src = '/assets/images/icon_remove.png';
     img.width = 15;
     img.onclick = function(){
       this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);
@@ -112,10 +138,11 @@ var StockGenerator =
     var removeDiv = this.CreateDOMElement('div','cancel');
     removeDiv.appendChild(img);
 
-    TickerItemDiv.appendChild(removeDiv);      
-    StockGenerator.RemoveTickersFade();
+    TickerItemDiv.appendChild(removeDiv);
+    
     TickersContainer.appendChild(TickerItemDiv); 
     StockGenerator.SortTickersContainer();
+  
   },
 
   SortTickersContainer : function(){
@@ -146,8 +173,9 @@ var StockGenerator =
 
 
     for(i in TickerItems){
-      if(TickerItems[i].nodeType == 1)
-        TickerItems[i].classList.remove('bgFade');
+      if(TickerItems[i].nodeType == 1) {
+        TickerItems[i].classList.remove('bgFade');     
+      }
     }
   },
 
@@ -161,9 +189,10 @@ var StockGenerator =
     
     var input = StockGenerator.CreateDOMElement("input","TickerInput");
     input.value = "Search or Get Quote";
+    input.id = "TickerInput";
     
     var img = StockGenerator.CreateDOMElement("img","AddButton");
-    img.src = "icon_add.png";
+    img.src = "/assets/images/icon_add.png";
     img.onclick = function(){
       StockGenerator.AddLocalTicker(input.value);
     }
@@ -182,12 +211,15 @@ var StockGenerator =
 
     input.onkeyup = function(){
       if(this.value != ""){
+        this.style.background = "url('/assets/images/bg_loading.gif') right top no-repeat";
+
         var req = new XMLHttpRequest();
         req.open("GET", "http://dev.markitondemand.com/Api/Lookup/jsonp?input=" + this.value);
         req.onload = function(e) {
           var data = e.currentTarget.responseText.split('(function () { })(')[1];
           data = data.slice(0,data.length-1);     
           StockGenerator.ShowTypeAhead(JSON.parse(data)[0]);
+          document.getElementById('TickerInput').style.background = "";
         }
         req.send(null);
       }
@@ -233,7 +265,40 @@ var StockGenerator =
     document.getElementById('TickerInputContainer').removeChild(o);
 
   },
+
+  CreateInfoIcon : function(){
+    var InfoIconDiv = StockGenerator.CreateDOMElement("div","InfoIcon");
+    var InfoIcon = StockGenerator.CreateDOMElement("img");
+    InfoIcon.src = "/assets/images/icon_info.png";
+    InfoIcon.onclick = function(){
+      StockGenerator.LoadMoreInfoPopover('Created by Dwkd\'s ChromeLabs@TBP<br> <a href="http://www.TheBluePipe.com" target="_blank">www.TheBluePipe.com</a> <div class="git" ><iframe src="http://ghbtns.com/github-btn.html?user=dwkd&repo=QuickQuote&type=fork" allowtransparency="true" frameborder="0" scrolling="0" width="60" height="20"></iframe> <iframe src="http://ghbtns.com/github-btn.html?user=dwkd&repo=QuickQuote&type=follow" allowtransparency="true" frameborder="0" scrolling="0" width="110" height="20"></iframe> <br><a href="http://github.com/dwkd/QuickQuote/issues" target="_blank">Report an issue</a></div>');
+    };
+    InfoIconDiv.appendChild(InfoIcon);
+    document.body.appendChild(InfoIconDiv);
+  },
   
+  LoadMoreInfoPopover : function(html){
+    var MoreInfoContainer = StockGenerator.CreateDOMElement("div","MoreInfoContainer");
+    MoreInfoContainer.id = "MoreInfoContainer";
+    var MoreInfo = StockGenerator.CreateDOMElement("div","MoreInfo",html);
+    var closeInfo = StockGenerator.CreateDOMElement("div","closeInfo","x");
+    closeInfo.onmouseover = function(){
+      this.style.background = "#333333";
+      this.style.color = "white";
+    }
+    closeInfo.onmouseout = function(){
+      this.style.background = "white";
+      this.style.color = "#999999";
+    }
+    closeInfo.onclick = function(){
+      this.parentNode.parentNode.parentNode.removeChild(document.getElementById('MoreInfoContainer'));
+    },
+
+    MoreInfo.appendChild(closeInfo);
+    MoreInfoContainer.appendChild(MoreInfo);
+    document.body.appendChild(MoreInfoContainer);
+  },
+
   CreateDOMElement : function(otype, oclass, oinnerHTML){
     var o = document.createElement(otype);
     if(typeof oclass != 'undefined')
