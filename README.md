@@ -4,7 +4,10 @@ A tiny chrome extension for retreiving stock quotes
 
 How-to
 ======
-Click thy umbrella!
+1. Open Chrome Web Store and search 'QuickQuote'
+2. Add extension to your Chrome browser
+3. Click the 'Q' icon next to the Chrome 'Customize and Control' icon
+
 
 
 License
